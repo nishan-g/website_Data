@@ -114,32 +114,35 @@ def process_facebook_links(links_list):
         extracted_data = json.load(f)
 
         for link in links_list:
+            if link == 'No Facebook link' or not link.startswith('https://www.facebook.com'):
+                continue  # Skip links that are not valid Facebook links
+
             # Check if the link has a trailing slash
             if link.endswith('/'):
                 page_id_url = link + 'about_profile_transparency'
             else:
                 page_id_url = link + '/about_profile_transparency'
 
-            if link != 'No Facebook link':
-                # Extract the page ID and email from the link
-                email = extract_text_from_span_class(link)
-                page_id = extract_pageid(page_id_url)
+            # Extract the page ID and email from the link
+            email = extract_text_from_span_class(link)
+            page_id = extract_pageid(page_id_url)
 
-                # Find the corresponding entry in the extracted data
-                for entry in extracted_data:
-                    if entry["facebook_link"] == link:
-                        # Update the entry with page ID and email
-                        entry["page_id"] = page_id
-                        entry["email"] = email
-                        break
+            # Find the corresponding entry in the extracted data
+            for entry in extracted_data:
+                if entry["facebook_link"] == link:
+                    # Update the entry with page ID and email
+                    entry["page_id"] = page_id
+                    entry["email"] = email
+                    break
 
-                # Write the updated data back to the JSON file
-                f.seek(0)
-                json.dump(extracted_data, f, indent=4)
-                f.truncate()
+            # Write the updated data back to the JSON file
+            f.seek(0)
+            json.dump(extracted_data, f, indent=4)
+            f.truncate()
+
 
 # Example usage
-# extract_facebook_links('website.json')
+extract_facebook_links('website.json')
 facebook_links = read_facebook_links('extracted_facebook_links.json')
 process_facebook_links(facebook_links)
 
